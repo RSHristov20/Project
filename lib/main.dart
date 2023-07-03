@@ -8,9 +8,9 @@ void main() {
 }
 
 class BuboApp extends StatelessWidget {
-  const BuboApp({super.key});
+  const BuboApp({Key? key}) : super(key: key);
 
-
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -23,9 +23,8 @@ class BuboApp extends StatelessWidget {
   }
 }
 
-
 class BuboHomePage extends StatefulWidget {
-  const BuboHomePage({super.key});
+  const BuboHomePage({Key? key}) : super(key: key);
 
   @override
   State<BuboHomePage> createState() => _BuboHomePageState();
@@ -69,9 +68,9 @@ class _BuboHomePageState extends State<BuboHomePage> {
                 });
               })),
           Positioned(
-            bottom: -40,
-            left: -60,
-            width: 400,
+            bottom: 30,
+            left: 30,
+            width: 200,
             child: Image.asset('assets/logo.png'),
           ),
         ],
@@ -80,105 +79,161 @@ class _BuboHomePageState extends State<BuboHomePage> {
   }
 }
 
-
 class BuboCategoryViewer extends StatelessWidget {
   final String language;
-  BuboCategoryViewer(this.language, {super.key});
+
+  const BuboCategoryViewer(this.language, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
-    var height = MediaQuery.of(context).size.height;
 
     var widthPerCategory = 300;
+
     if (width > widthPerCategory) {
       var itemsPerRow = (width / widthPerCategory).floor();
-      var rows = (buboCategories.length / itemsPerRow).ceil();
 
       return GridView.count(
         mainAxisSpacing: 10,
         crossAxisSpacing: 0,
         crossAxisCount: itemsPerRow,
         children: buboCategories.map((buboCategory) {
-          return BuboCategoryListItem(language, buboCategory);
+          return BuboCategoryListItem(language: language, category: buboCategory);
         }).toList(),
       );
-
     } else {
       return ListView(
         children: buboCategories.map((buboCategory) {
-          return BuboCategoryListItem(language, buboCategory);
+          return BuboCategoryListItem(language: language, category: buboCategory);
         }).toList(),
       );
     }
-
   }
 }
 
-
-class BuboCategoryListItem extends StatelessWidget {
+class BuboCategoryListItem extends StatefulWidget {
   final String language;
   final BuboCategory category;
 
-  const BuboCategoryListItem(this.language, this.category, {super.key});
+  const BuboCategoryListItem({required this.language, required this.category, Key? key})
+      : super(key: key);
+
+  @override
+  _BuboCategoryListItemState createState() => _BuboCategoryListItemState();
+}
+
+class _BuboCategoryListItemState extends State<BuboCategoryListItem>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  bool _isHovered = false;
+
+  @override
+  void initState() {
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _animation = Tween<double>(begin: 0, end: 1).animate(_animationController);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(category.image, width: 250, fit: BoxFit.fill),
-          Text(
-              category.translatedLabels[language]!,
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 30,
-                  color: Colors.white),
-            ),
-        ],
+    return GestureDetector(
+      onTap: () {
+        // Handle category tap
+      },
+      child: MouseRegion(
+        onEnter: (_) {
+          setState(() {
+            _isHovered = true;
+            _animationController.forward();
+          });
+        },
+        onExit: (_) {
+          setState(() {
+            _isHovered = false;
+            _animationController.reverse();
+          });
+        },
+        child: AnimatedBuilder(
+          animation: _animationController,
+          builder: (context, child) {
+            final transform = Matrix4.identity()
+              ..setEntry(3, 2, 0.001)
+              ..rotateY(_animation.value * 3.141592);
+            return Transform(
+              transform: transform,
+              alignment: Alignment.center,
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: _isHovered ? Colors.blue : Colors.transparent,
+                  border: _isHovered
+                      ? Border.all(color: Colors.blue, width: 2)
+                      : Border.all(color: Colors.transparent),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: _isHovered
+                    ? _buildBackContent()
+                    : _buildFrontContent(),
+              ),
+            );
+          },
+        ),
       ),
-      Container(
-        height: 10,
-      )
-    ]);
+    );
   }
 
-  Widget _viewWithStack() {
-    return Stack(
+  Widget _buildFrontContent() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        SizedBox(width: 250, height: 250, child: Image.asset(category.image)),
-        Positioned(
-            top: 190,
-            left: 0,
-            width: 250,
-            child: Center(
-                child: Text(
-              category.translatedLabels[language] != null
-                  ? category.translatedLabels[language]!
-                  : 'Not available',
-              style: const TextStyle(color: Colors.white, fontSize: 30),
-            ))),
+        Image.asset(widget.category.image, width: 230, fit: BoxFit.fill),
+        const SizedBox(height: 2),
+        Text(
+          widget.category.translatedLabels[widget.language] ?? 'Not available',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 30,
+            color: Colors.white,
+          ),
+        ),
       ],
     );
   }
 
-  Widget _viewWithContainer() {
-    return Container(
-        width: 250,
-        height: 250,
-        decoration: BoxDecoration(
-            image: DecorationImage(image: AssetImage(category.image))),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 150),
-          child: Center(
-            child: Text(
-              category.translatedLabels[language] != null
-                  ? category.translatedLabels[language]!
-                  : 'Not available',
-              style: const TextStyle(color: Colors.white, fontSize: 30),
-            ),
+  Widget _buildBackContent() {
+  return Container(
+    width: 500,
+    height: 500,
+    decoration: BoxDecoration(
+      color: Colors.red,
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Transform(
+      transform: Matrix4.identity()..rotateY(-3.141592),
+      alignment: Alignment.center,
+      child: Center(
+        child: Text(
+          'Manchester United',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 30,
+            color: Colors.white,
           ),
-        ));
-  }
+        ),
+      ),
+    ),
+  );
+}
+
 }
