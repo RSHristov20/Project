@@ -1,16 +1,11 @@
-# bubolechka2
+<h1 align="center">Project</h1>
+<h3 align="center">Manchester United</h3>
 
-This is a tutorial project for flutter development
+## Installation
 
-## Getting Started with Flutter
+You can download the site from [github](https://github.com/RSHristov20/bubolechka2) by pressing the green clone button.
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Used technologies
+- <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Visual_Studio_Code_1.35_icon.svg/2048px-Visual_Studio_Code_1.35_icon.svg.png" width="20"> Visual studio code
+- <img src="https://play-lh.googleusercontent.com/qbeCduZblOk80GaY164lw47gIRjXq9QIzSmgFwqQj1PyhNhTWxYR0OqPzm8BumnmJQ" width="20"> Dart
+- <img src="https://static.javatpoint.com/tutorial/flutter/images/flutter-logo.png" width="20"> Flutter
